@@ -1,0 +1,2 @@
+src/Osma.Mobile.App.Android/libs/** filter=lfs diff=lfs merge=lfs -text
+src/Osma.Mobile.App.iOS/libs/** filter=lfs diff=lfs merge=lfs -text
