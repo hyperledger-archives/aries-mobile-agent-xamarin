@@ -6,7 +6,7 @@ using Acr.UserDialogs;
 using Osma.Mobile.App.Services.Interfaces;
 using ReactiveUI;
 using Xamarin.Forms;
-using AgentFramework.Core.Models.Records;
+using Hyperledger.Aries.Features.IssueCredential;
 
 namespace Osma.Mobile.App.ViewModels.Credentials
 {

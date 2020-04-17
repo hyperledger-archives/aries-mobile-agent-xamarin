@@ -1,6 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using System.Diagnostics;
+using Autofac;
 using FFImageLoading.Forms.Platform;
 using Foundation;
+using Microsoft.Extensions.DependencyInjection;
 using Osma.Mobile.App.Converters;
 using Osma.Mobile.App.Services;
 using UIKit;
@@ -13,6 +16,8 @@ namespace Osma.Mobile.App.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
+        private App _application;
+
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
         // method you should instantiate the window, load the UI into it and then make the window
@@ -40,11 +45,12 @@ namespace Osma.Mobile.App.iOS
             // Initializing QR Code Scanning support
             ZXing.Net.Mobile.Forms.iOS.Platform.Init();
 
-            var builder = new ContainerBuilder();
-            builder.RegisterModule(new PlatformModule());
-            builder.RegisterModule(new ServicesModule());
-            var container = builder.Build();
-            LoadApplication(new App(container));
+            var host = App
+               .BuildHost(typeof(PlatformModule).Assembly)
+               .Build();
+
+            _application = host.Services.GetRequiredService<App>();
+            LoadApplication(_application);
 #endif
             return base.FinishedLaunching(app, options);
         }
