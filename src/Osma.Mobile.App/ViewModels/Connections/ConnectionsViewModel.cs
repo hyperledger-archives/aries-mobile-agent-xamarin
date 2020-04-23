@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Messages.Connections;
-using AgentFramework.Core.Utils;
 using Autofac;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Utils;
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Extensions;
 using Osma.Mobile.App.Services;
 using Osma.Mobile.App.Services.Interfaces;
+using Osma.Mobile.App.Utilities;
 using Osma.Mobile.App.ViewModels.CreateInvitation;
 using ReactiveUI;
 using Xamarin.Forms;
@@ -23,14 +26,14 @@ namespace Osma.Mobile.App.ViewModels.Connections
     public class ConnectionsViewModel : ABaseViewModel
     {
         private readonly IConnectionService _connectionService;
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
         private readonly IEventAggregator _eventAggregator;
         private readonly ILifetimeScope _scope;
 
         public ConnectionsViewModel(IUserDialogs userDialogs,
                                     INavigationService navigationService,
                                     IConnectionService connectionService,
-                                    ICustomAgentContextProvider agentContextProvider,
+                                    IAgentProvider agentContextProvider,
                                     IEventAggregator eventAggregator,
                                     ILifetimeScope scope) :
                                     base("Connections", userDialogs, navigationService)
@@ -78,33 +81,30 @@ namespace Osma.Mobile.App.ViewModels.Connections
         public async Task ScanInvite()
         {
             var expectedFormat = ZXing.BarcodeFormat.QR_CODE;
-            var opts = new ZXing.Mobile.MobileBarcodeScanningOptions{ PossibleFormats = new List<ZXing.BarcodeFormat> { expectedFormat }};
+            var opts = new ZXing.Mobile.MobileBarcodeScanningOptions { PossibleFormats = new List<ZXing.BarcodeFormat> { expectedFormat } };
 
-            var scannerPage = new ZXingScannerPage(opts);
-            scannerPage.OnScanResult += (result) => {
-                scannerPage.IsScanning = false;
+            var scanner = new ZXing.Mobile.MobileBarcodeScanner();
 
-                ConnectionInvitationMessage invitation;
+            var result = await scanner.Scan(opts);
+            if (result == null) return;
 
-                try
-                {
-                    invitation = MessageUtils.DecodeMessageFromUrlFormat<ConnectionInvitationMessage>(result.Text);
-                }
-                catch (Exception)
-                {
-                    DialogService.Alert("Invalid invitation!");
-                    Device.BeginInvokeOnMainThread(async () => await NavigationService.PopModalAsync());
-                    return;
-                }
+            ConnectionInvitationMessage invitation;
 
-                Device.BeginInvokeOnMainThread(async () =>
-                {
-                    await NavigationService.PopModalAsync();
-                    await NavigationService.NavigateToAsync<AcceptInviteViewModel>(invitation, NavigationType.Modal);
-                });
-            };
+            try
+            {
+                invitation = await MessageDecoder.ParseMessageAsync(result.Text) as ConnectionInvitationMessage
+                    ?? throw new Exception("Unknown message type");
+            }
+            catch (Exception)
+            {
+                DialogService.Alert("Invalid invitation!");
+                return;
+            }
 
-            await NavigationService.NavigateToAsync((Page)scannerPage, NavigationType.Modal);
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                await NavigationService.NavigateToAsync<AcceptInviteViewModel>(invitation, NavigationType.Modal);
+            });
         }
 
         public async Task SelectConnection(ConnectionViewModel connection) => await NavigationService.NavigateToAsync(connection);

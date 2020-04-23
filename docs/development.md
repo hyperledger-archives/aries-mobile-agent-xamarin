@@ -5,8 +5,12 @@ The following document describes several conventions and technologies adopted by
 ## Project Structure
 
     ├── docs                         # Docs folder
+    ├── mediator                     # Mediator agent
+    ├── libs
+    │  ├── android                   # Static libraries for Android
+    │  ├── ios                       # Static libraries for iOS     
     ├── src                          # Source folder
-    │   ├── osma-mobile-app.sln       # Main application solution file.
+    │   ├── osma-mobile-app.sln      # Main application solution file.
     │   ├── Osma.Mobile.App          # Location of Xamarin.Forms App shared between the two platforms invoked by each platform.
     │   ├── Osma.Mobile.App.Android  # Location of the Android platform app.
     │   ├── Osma.Mobile.App.iOS      # Location of the iOS platform app.

@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Acr.UserDialogs;
 using Android;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using Autofac;
 using FFImageLoading.Forms.Platform;
 using Java.Lang;
-using Osma.Mobile.App.Converters;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Xamarin.Forms;
 
 namespace Osma.Mobile.App.Droid
@@ -23,43 +23,31 @@ namespace Osma.Mobile.App.Droid
 
             base.OnCreate(bundle);
 
-            Rg.Plugins.Popup.Popup.Init(this, bundle);
-
             Forms.Init(this, bundle);
 
+            Acr.UserDialogs.UserDialogs.Init(this);
             // Initializing FFImageLoading
             CachedImageRenderer.Init(false);
-
-            // Initializing User Dialogs
-            UserDialogs.Init(this);
-
+            //Rg.Plugins.Popup.Popup.Init(this, bundle);
             // Initializing Xamarin Essentials
             Xamarin.Essentials.Platform.Init(this, bundle);
-
-#if GORILLA
-            LoadApplication(UXDivers.Gorilla.Droid.Player.CreateApplication(
-                this,
-                new UXDivers.Gorilla.Config("Good Gorilla")
-                .RegisterAssemblyFromType<InverseBooleanConverter>()
-                .RegisterAssemblyFromType<CachedImageRenderer>()));
-#else
-            //Loading dependent libindy
-            JavaSystem.LoadLibrary("gnustl_shared");
-            JavaSystem.LoadLibrary("indy");
 
             // Initializing QR Code Scanning support
             ZXing.Net.Mobile.Forms.Android.Platform.Init();
 
-            //Marshmellow and above require permission requests to be made at runtime
-            if ((int)Build.VERSION.SdkInt >= 23)
-                CheckAndRequestRequiredPermissions();
+            // Initializing User Dialogs
+            // Android requires that we set content root.
+            var host = App.BuildHost(typeof(PlatformModule).Assembly)
+                .UseContentRoot(System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal)).Build();
 
-            var builder = new ContainerBuilder();
-            builder.RegisterModule(new PlatformModule());
-            var container = builder.Build();
+            //Loading dependent libindy
+            JavaSystem.LoadLibrary("c++_shared");
+            JavaSystem.LoadLibrary("indy");
 
-            LoadApplication(new App(container));
-#endif
+            LoadApplication(host.Services.GetRequiredService<App>());
+
+            CheckAndRequestRequiredPermissions();
         }
 
         readonly string[] _permissionsRequired =

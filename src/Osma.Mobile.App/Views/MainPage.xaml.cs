@@ -12,9 +12,9 @@ namespace Osma.Mobile.App.Views
 			InitializeComponent ();
 		}
 
-        private void CurrentPageChanged(object sender, System.EventArgs e) => Title = GetPageName(CurrentPage);
+        private new void CurrentPageChanged(object sender, System.EventArgs e) => Title = GetPageName(CurrentPage);
 
-        private void Appearing(object sender, System.EventArgs e) => Title = GetPageName(CurrentPage);
+        private new void Appearing(object sender, System.EventArgs e) => Title = GetPageName(CurrentPage);
 
         private string GetPageName(Page page)
         {
