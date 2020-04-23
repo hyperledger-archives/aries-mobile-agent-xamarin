@@ -1,8 +1,15 @@
-using System.Threading.Tasks;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Timers;
 using Autofac;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
+using Autofac.Extensions.DependencyInjection;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Routing;
+using Hyperledger.Aries.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Osma.Mobile.App.Services.Interfaces;
 using Osma.Mobile.App.Utilities;
 using Osma.Mobile.App.ViewModels;
@@ -15,10 +22,9 @@ using Osma.Mobile.App.Views.Account;
 using Osma.Mobile.App.Views.Connections;
 using Osma.Mobile.App.Views.CreateInvitation;
 using Osma.Mobile.App.Views.Credentials;
+using Xamarin.Essentials;
 using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
-using MainPage = Osma.Mobile.App.Views.MainPage;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Osma.Mobile.App
@@ -26,26 +32,70 @@ namespace Osma.Mobile.App
     public partial class App : Application
     {
         public new static App Current => Application.Current as App;
-        public Palette Colors;
+        public static IContainer Container { get; set; }
 
-        private readonly INavigationService _navigationService;
-        private readonly ICustomAgentContextProvider _contextProvider;
+        // Timer to check new messages in the configured mediator agent every 10sec
+        private readonly Timer timer;
+        private static IHost Host { get; set; }
 
-        public App(IContainer container)
+        public App()
         {
             InitializeComponent();
 
-            Colors.Init();
-            _navigationService = container.Resolve<INavigationService>();
-            _contextProvider = container.Resolve<ICustomAgentContextProvider>();
-
-            InitializeTask = Initialize();
+            timer = new Timer
+            {
+                Enabled = false,
+                AutoReset = true,
+                Interval = TimeSpan.FromSeconds(10).TotalMilliseconds
+            };
+            timer.Elapsed += Timer_Elapsed;
         }
 
-        Task InitializeTask;
-        private async Task Initialize()
+        public App(IHost host) : this() => Host = host;
+
+        public static IHostBuilder BuildHost(Assembly platformSpecific = null) =>
+            XamarinHost.CreateDefaultBuilder<App>()
+                .ConfigureServices((_, services) =>
+                {
+                    services.AddAriesFramework(builder => builder.RegisterEdgeAgent(
+                        options: options =>
+                        {
+                            options.EndpointUri = "http://localhost:5000";
+
+                            options.WalletConfiguration.StorageConfiguration =
+                                new WalletConfiguration.WalletStorageConfiguration
+                                {
+                                    Path = Path.Combine(
+                                        path1: FileSystem.AppDataDirectory,
+                                        path2: ".indy_client",
+                                        path3: "wallets")
+                                };
+                            options.WalletConfiguration.Id = "MobileWallet";
+                            options.WalletCredentials.Key = "SecretWalletKey";
+                            options.RevocationRegistryDirectory = Path.Combine(
+                                path1: FileSystem.AppDataDirectory,
+                                path2: ".indy_client",
+                                path3: "tails");
+                        },
+                        delayProvisioning: true));
+
+                    var containerBuilder = new ContainerBuilder();
+                    containerBuilder.RegisterAssemblyModules(typeof(CoreModule).Assembly);
+                    if (platformSpecific != null)
+                    {
+                        containerBuilder.RegisterAssemblyModules(platformSpecific);
+                    }
+
+                    containerBuilder.Populate(services);
+                    Container = containerBuilder.Build();
+                });
+
+        protected override async void OnStart()
         {
-            //Pages
+            await Host.StartAsync();
+
+            // View models and pages mappings
+            var _navigationService = Container.Resolve<INavigationService>();
             _navigationService.AddPageViewModelBinding<MainViewModel, MainPage>();
             _navigationService.AddPageViewModelBinding<ConnectionsViewModel, ConnectionsPage>();
             _navigationService.AddPageViewModelBinding<ConnectionViewModel, ConnectionPage>();
@@ -56,7 +106,7 @@ namespace Osma.Mobile.App
             _navigationService.AddPageViewModelBinding<AccountViewModel, AccountPage>();
             _navigationService.AddPageViewModelBinding<CreateInvitationViewModel, CreateInvitationPage>();
 
-            if (_contextProvider.AgentExists())
+            if (Preferences.Get(AppConstant.LocalWalletProvisioned, false))
             {
                 await _navigationService.NavigateToAsync<MainViewModel>();
             }
@@ -64,25 +114,35 @@ namespace Osma.Mobile.App
             {
                 await _navigationService.NavigateToAsync<RegisterViewModel>();
             }
+
+            timer.Enabled = true;
         }
 
-        protected override void OnStart()
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            #if !DEBUG 
-                AppCenter.Start("ios=" + AppConstant.IosAnalyticsKey + ";" +
-                                "android=" + AppConstant.AndroidAnalyticsKey + ";",
-                        typeof(Analytics), typeof(Crashes));
-            #endif
+            // Check for new messages with the mediator agent if successfully provisioned
+            if (Preferences.Get(AppConstant.LocalWalletProvisioned, false))
+            {
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    try
+                    {
+                        var context = await Container.Resolve<IAgentProvider>().GetContextAsync();
+                        await Container.Resolve<IEdgeClientService>().FetchInboxAsync(context);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
+                });
+            }
         }
+        protected override void OnSleep() =>
+            // Stop timer when application goes to background
+            timer.Enabled = false;
 
-        protected override void OnSleep()
-        {
-            // Handle when your app sleeps
-        }
-
-        protected override void OnResume()
-        {
-            // Handle when your app resumes
-        }
+        protected override void OnResume() =>
+            // Resume timer when application comes in foreground
+            timer.Enabled = true;
     }
 }

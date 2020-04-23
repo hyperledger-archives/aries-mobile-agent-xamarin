@@ -1,60 +1,55 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Models.Wallets;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Agents.Edge;
+using Hyperledger.Aries.Configuration;
 using Osma.Mobile.App.Services.Interfaces;
-using Osma.Mobile.App.Services.Models;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace Osma.Mobile.App.ViewModels
 {
     public class RegisterViewModel : ABaseViewModel
     {
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
+        private readonly IEdgeProvisioningService provisioningService;
 
-        public RegisterViewModel(IUserDialogs userDialogs, 
-                                 INavigationService navigationService,
-                                 ICustomAgentContextProvider agentContextProvider) : base(
-                                 nameof(RegisterViewModel), 
-                                 userDialogs, 
-                                 navigationService)
+        public RegisterViewModel(
+            IUserDialogs userDialogs,
+            INavigationService navigationService,
+            IAgentProvider agentProvider,
+            IEdgeProvisioningService provisioningService) : base(
+                nameof(RegisterViewModel),
+                userDialogs,
+                navigationService)
         {
-            _agentContextProvider = agentContextProvider;
+            _agentContextProvider = agentProvider;
+            this.provisioningService = provisioningService;
         }
 
         #region Bindable Commands
         public ICommand CreateWalletCommand => new Command(async () =>
         {
             var dialog = UserDialogs.Instance.Loading("Creating wallet");
-            
-            //TODO this register VM will have far more logic around the registration complexities, i.e backupservices
-            //suppling ownership info to the agent etc..
-            var options = new AgentOptions
-            {
-                PoolOptions = new PoolOptions
-                {
-                    GenesisFilename = "pool_genesis.txn",
-                    PoolName = "EdgeAgentPoolConnection",
-                    ProtocolVersion = 2
-                },
-                WalletOptions = new WalletOptions
-                {
-                    WalletConfiguration = new WalletConfiguration {Id = Guid.NewGuid().ToString() },
-                    WalletCredentials = new WalletCredentials {Key = "LocalWalletKey" }
-                }
-            };
 
-            if (await _agentContextProvider.CreateAgentAsync(options))
+            try
             {
+                await provisioningService.ProvisionAsync();
+                Preferences.Set(AppConstant.LocalWalletProvisioned, true);
+
                 await NavigationService.NavigateToAsync<MainViewModel>();
-                dialog?.Hide();
-                dialog?.Dispose();
             }
-            else
+            catch(Exception e)
+            {
+                UserDialogs.Instance.Alert($"Failed to create wallet: {e.Message}");
+                Debug.WriteLine(e);
+            }
+            finally
             {
                 dialog?.Hide();
                 dialog?.Dispose();
-                UserDialogs.Instance.Alert("Failed to create wallet!");
             }
         });
         #endregion

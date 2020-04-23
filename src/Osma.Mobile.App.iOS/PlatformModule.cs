@@ -9,7 +9,6 @@ namespace Osma.Mobile.App.iOS
         {
             base.Load(builder);
             builder.RegisterModule(new CoreModule());
-            builder.RegisterModule(new ServicesModule());
         }
     }
 }

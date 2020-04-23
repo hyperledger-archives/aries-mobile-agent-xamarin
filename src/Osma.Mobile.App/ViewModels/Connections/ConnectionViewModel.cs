@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Messages;
-using AgentFramework.Core.Messages.Common;
-using AgentFramework.Core.Messages.Discovery;
-using AgentFramework.Core.Models.Records;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Features.Discovery;
+using Hyperledger.Aries.Features.TrustPing;
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Extensions;
 using Osma.Mobile.App.Services.Interfaces;
@@ -22,7 +22,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
     {
         private readonly ConnectionRecord _record;
 
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
         private readonly IMessageService _messageService;
         private readonly IDiscoveryService _discoveryService;
         private readonly IConnectionService _connectionService;
@@ -30,7 +30,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
 
         public ConnectionViewModel(IUserDialogs userDialogs,
                                    INavigationService navigationService,
-                                   ICustomAgentContextProvider agentContextProvider,
+                                   IAgentProvider agentContextProvider,
                                    IMessageService messageService,
                                    IDiscoveryService discoveryService,
                                    IConnectionService connectionService,
@@ -49,9 +49,9 @@ namespace Osma.Mobile.App.ViewModels.Connections
             _record = record;
             MyDid = _record.MyDid;
             TheirDid = _record.TheirDid;
-            ConnectionName = _record.Alias.Name;
+            ConnectionName = _record.Alias?.Name;
             ConnectionSubtitle = $"{_record.State:G}";
-            ConnectionImageUrl = _record.Alias.ImageUrl;
+            ConnectionImageUrl = _record.Alias?.ImageUrl;
         }
 
         public override async Task InitializeAsync(object navigationData)
@@ -71,7 +71,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
 
             try
             {
-                var response = await _messageService.SendAsync(context.Wallet, message, _record, null, true);
+                var response = await _messageService.SendReceiveAsync(context.Wallet, message, _record) as UnpackedMessageContext;
                 protocols = response.GetMessage<DiscoveryDiscloseMessage>();
             }
             catch (Exception)
@@ -129,7 +129,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
             bool success = false;
             try
             {
-                var response = await _messageService.SendAsync(context.Wallet, message, _record, null, true);
+                var response = await _messageService.SendReceiveAsync(context.Wallet, message, _record) as UnpackedMessageContext;
                 var trustPingResponse = response.GetMessage<TrustPingResponseMessage>();
                 success = true;
             }

@@ -6,9 +6,29 @@ This original commit in this repository contains all contributions from the orig
 
 Note: Not all references to osma have been changed. Please change them as you find them, PRs accepted.
 
-The primary goals of this project is to provide a common project to progress emerging community standards around mobile agents.
+The primary goals of this project is to provide a common project to progress emerging community standards around mobile agents. In addition, a basic mediator agent in ASP.NET Core is included in this repo. This mediator agent can be run separately and can be configured as public access point for the mobile application. Please check the instructions below or watch the instructuonal video.
 
 This repository contains a cross platform mobile app (iOS/Android) built using the Xamarin framework in C#. More specifically the two platform specific projects share a common UI through the use of Xamarin.Forms.
+
+## Getting started
+1. Clone this repo
+2. [Download](https://hyperledger-org.bintray.com/aries/) and extract static libraries required for iOS and Android projects in the `libs` folder
+3. Run the mediator agent inside `mediator` folder by running `dotnet run` in terminal
+4. Open osma-mobile-app.sln and build
+
+For more information on the development practices featured in this repository please refer to [here](docs/development.md)
+
+### Working with public endpoint
+
+To work with public endpoints, use Ngrok and start it to listen on port 5000. Copy the assigned URL to the following locations
+- In `mediator/Startup.cs` replace the `EndpointUri` to instruct the mediator to use this address in configuration.
+- In `src/Osma.Mobile.App/App.xaml.cs` replace the `EndpointUri` to configure the mobile app to use this public endpoint as mediator service
+
+> You may have to clear previously created wallets in `~/.indy_client/wallet` for the changes to the mediator to work. Check if the mediator is configured with this address by opening it in a browser
+
+## A Quick Demo
+
+Watch this [Getting started with AMA-X](https://www.loom.com/share/5c52c185673046b688bdd1ef7d280185) video to learn how to run and configure the mobile agent with a publicly acessible mediator service
 
 ## Background
 
@@ -28,30 +48,8 @@ There are several key standards in the SSI space but arguably the most important
 
 ### AgentFramework
 
-This mobile apps primary dependency is upon the open source project [AgentFramework](https://github.com/streetcred-id/agent-framework). This framework provides the baseline components for realizing agents, AMA-X extends this framework in the context of a mobile app to realize a mobile agent.
+This mobile apps primary dependency is upon the open source project [Aries Framework for .NET](https://github.com/hyperledger/aries-framework-dotnet). This framework provides the baseline components for realizing agents, AMA-X extends this framework in the context of a mobile app to realize a mobile agent.
 
 ### Indy
 
-Much of the emerging standards AMA-X and AgentFramework implement are born out of the [Indy-Agent]() community.
-
-## Getting started
-1. Clone it locally,
-2. Run `git lfs pull` in order to pull the dependent native libraries with LFS. If you do not have this installed please refer to [here](docs/development.md)  
-3. Open osma-mobile-app.sln and build!
-
-For more information on the development practices featured in this repository please refer to [here](docs/development.md)
-
-## A Quick Demo
-
-The following demo describes how you can connect with another agent.
-
-1. Clone [AgentFramework](https://github.com/streetcred-id/agent-framework)
-2. From the `/scripts` folder in the repository run `./start-web-agents.sh` - Note this shell script relies on [ngrok](https://ngrok.com/) to run the agents on a publicly accessible addresses. Please ensure that your ngrok version is 2.3.28 or higher. You may get an error if the port stated is protected or in use - curl: (7) Failed to connect to localhost port <port>: Connection refused. If this happens simply scan for an open port and change the port number for web_addr in `/scripts/web-agents-ngrok-config.yaml` and also on line number 6 of `/scripts/start-web-agents.sh`. For Macbook open network utility to scan ports.
-3. Note the public URL's that are outputed by the script with the following text `Starting Web Agents with public urls http://... http://...`
-4. Browse to one of the urls noted above.
-5. In the rendered UI, click `Connections`->`Create Invitation`, a QR code should be displayed.
-6. In the osma mobile app, deployed to a mobile phone, click the connect button in the top right corner of the connections tab.
-7. Scan the QR code rendered in the browser with the osma mobile app and click connect in the rendered UI.
-8. Congrats, you should now be redirected in the mobile app back to the connections page showing a new connection with the AgentFramework web agent! 
-
-
+Much of the emerging standards AMA-X and Aries Framework implement are born out of the [Indy-Agent]() community.

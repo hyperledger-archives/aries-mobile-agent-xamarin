@@ -6,7 +6,6 @@
     xmlns:behaviours="clr-namespace:Osma.Mobile.App.Behaviors;assembly=Osma.Mobile.App"
     xmlns:components="clr-namespace:Osma.Mobile.App.Views.Components;assembly=Osma.Mobile.App"
     xmlns:zxing="clr-namespace:ZXing.Net.Mobile.Forms;assembly=ZXing.Net.Mobile.Forms"
-    xmlns:zxcm="clr-namespace:ZXing.Common;assembly=zxing.portable"
     x:Class="Osma.Mobile.App.Views.CreateInvitation.CreateInvitationPage"
     Title="Create Invitation">
     <ContentPage.Resources>
@@ -25,9 +24,6 @@
                             BarcodeFormat="QR_CODE"
                             HorizontalOptions="FillAndExpand"
                             VerticalOptions="FillAndExpand">
-                <zxing:ZXingBarcodeImageView.BarcodeOptions>
-                    <zxcm:EncodingOptions Width="200" Height="200" />
-                </zxing:ZXingBarcodeImageView.BarcodeOptions>
             </zxing:ZXingBarcodeImageView>
         </StackLayout>
     </ScrollView>

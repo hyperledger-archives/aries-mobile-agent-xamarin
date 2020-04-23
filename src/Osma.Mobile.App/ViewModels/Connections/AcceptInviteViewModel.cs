@@ -3,13 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Messages.Connections;
-using AgentFramework.Core.Exceptions;
 using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Services.Interfaces;
 using ReactiveUI;
 using Xamarin.Forms;
+using Hyperledger.Aries.Configuration;
+using Hyperledger.Aries.Features.DidExchange;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
+using Hyperledger.Aries;
 
 namespace Osma.Mobile.App.ViewModels.Connections
 {
@@ -18,9 +20,8 @@ namespace Osma.Mobile.App.ViewModels.Connections
         private readonly IProvisioningService _provisioningService;
         private readonly IConnectionService _connectionService;
         private readonly IMessageService _messageService;
-        private readonly ICustomAgentContextProvider _contextProvider;
+        private readonly IAgentProvider _contextProvider;
         private readonly IEventAggregator _eventAggregator;
-        private static readonly String GENERIC_CONNECTION_REQUEST_FAILURE_MESSAGE = "Failed to accept invite!";
 
         private ConnectionInvitationMessage _invite;
 
@@ -29,7 +30,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
                                      IProvisioningService provisioningService,
                                      IConnectionService connectionService,
                                      IMessageService messageService,
-                                     ICustomAgentContextProvider contextProvider,
+                                     IAgentProvider contextProvider,
                                      IEventAggregator eventAggregator)
                                      : base("Accept Invitiation", userDialogs, navigationService)
         {
@@ -53,55 +54,24 @@ namespace Osma.Mobile.App.ViewModels.Connections
             return base.InitializeAsync(navigationData);
         }
 
-        private async Task CreateConnection(IAgentContext context, ConnectionInvitationMessage invite)
-        {
-            var provisioningRecord = await _provisioningService.GetProvisioningAsync(context.Wallet);
-            var isEndpointUriAbsent = provisioningRecord.Endpoint.Uri == null;
-            var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
-            var rsp = await _messageService.SendAsync(context.Wallet, msg, rec, _invite.RecipientKeys.First(), isEndpointUriAbsent);
-            if (isEndpointUriAbsent)
-            {
-                await _connectionService.ProcessResponseAsync(context, rsp.GetMessage<ConnectionResponseMessage>(), rec);
-            }
-        }
-
         #region Bindable Commands
         public ICommand AcceptInviteCommand => new Command(async () =>
         {
             var loadingDialog = DialogService.Loading("Processing");
-
             var context = await _contextProvider.GetContextAsync();
 
-            if (context == null || _invite == null)
-            {
-                loadingDialog.Hide();
-                DialogService.Alert("Failed to decode invite!");
-                return;
-            }
-
-            String errorMessage = String.Empty;
             try
             {
-                await CreateConnection(context, _invite);
-            }
-            catch (AgentFrameworkException agentFrameworkException)
-            {
-                errorMessage = agentFrameworkException.Message;
-            }
-            catch (Exception) //TODO more granular error protection
-            {
-                errorMessage = GENERIC_CONNECTION_REQUEST_FAILURE_MESSAGE;
-            }
+                var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
+                await _messageService.SendAsync(context.Wallet, msg, rec);
 
-            _eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.ConnectionsUpdated });
-
-            if (loadingDialog.IsShowing)
+                _eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.ConnectionsUpdated });
+            }
+            finally
+            {
                 loadingDialog.Hide();
-
-            if (!String.IsNullOrEmpty(errorMessage))
-                DialogService.Alert(errorMessage);
-
-            await NavigationService.PopModalAsync();
+                await NavigationService.PopModalAsync();
+            }
         });
 
         public ICommand RejectInviteCommand => new Command(async () => await NavigationService.PopModalAsync());

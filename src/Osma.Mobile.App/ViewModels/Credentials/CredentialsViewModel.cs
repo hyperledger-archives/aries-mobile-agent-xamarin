@@ -5,9 +5,9 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
-using AgentFramework.Core.Contracts;
-using AgentFramework.Core.Models.Records;
 using Autofac;
+using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Features.IssueCredential;
 using Osma.Mobile.App.Extensions;
 using Osma.Mobile.App.Services;
 using Osma.Mobile.App.Services.Interfaces;
@@ -20,14 +20,14 @@ namespace Osma.Mobile.App.ViewModels.Credentials
     public class CredentialsViewModel : ABaseViewModel
     {
         private readonly ICredentialService _credentialService;
-        private readonly ICustomAgentContextProvider _agentContextProvider;
+        private readonly IAgentProvider _agentContextProvider;
         private readonly ILifetimeScope _scope;
 
         public CredentialsViewModel(
             IUserDialogs userDialogs,
             INavigationService navigationService,
             ICredentialService credentialService,
-            ICustomAgentContextProvider agentContextProvider,
+            IAgentProvider agentContextProvider,
             ILifetimeScope scope
             ) : base(
                 "Credentials",
