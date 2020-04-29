@@ -34,6 +34,7 @@ namespace Osma.Mobile.App.Droid
 
             // Initializing QR Code Scanning support
             ZXing.Net.Mobile.Forms.Android.Platform.Init();
+            ZXing.Mobile.MobileBarcodeScanner.Initialize(Application);
 
             // Initializing User Dialogs
             // Android requires that we set content root.
