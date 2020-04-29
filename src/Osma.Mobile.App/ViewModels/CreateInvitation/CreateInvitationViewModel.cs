@@ -48,7 +48,7 @@ namespace Osma.Mobile.App.ViewModels.CreateInvitation
                     TheirAlias = new ConnectionAlias { Name = "Invitation" }
                 });
 
-                string barcodeValue = invitation.ServiceEndpoint + "?c_i=" + invitation.ToJson().ToBase64();
+                string barcodeValue = invitation.ServiceEndpoint + "?d_m=" + Uri.EscapeDataString(invitation.ToByteArray().ToBase64String());
                 QrCodeValue = barcodeValue;
             }
             catch (Exception ex)
