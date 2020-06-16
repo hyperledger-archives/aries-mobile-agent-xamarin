@@ -11,10 +11,11 @@ The primary goals of this project is to provide a common project to progress eme
 This repository contains a cross platform mobile app (iOS/Android) built using the Xamarin framework in C#. More specifically the two platform specific projects share a common UI through the use of Xamarin.Forms.
 
 ## Getting started
-1. Clone this repo
-2. [Download](https://hyperledger-org.bintray.com/aries/) and extract static libraries required for iOS and Android projects in the `libs` folder
-3. Run the mediator agent inside `mediator` folder by running `dotnet run` in terminal
-4. Open osma-mobile-app.sln and build
+1. Make sure you have [indy-sdk installed](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
+2. Clone this repo
+3. [Download](https://hyperledger-org.bintray.com/aries/) and extract static libraries required for iOS and Android projects in the `libs` folder
+4. Run the mediator agent inside `mediator` folder by running `dotnet run` in terminal
+5. Open osma-mobile-app.sln and build
 
 For more information on the development practices featured in this repository please refer to [here](docs/development.md)
 
