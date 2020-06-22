@@ -5,6 +5,7 @@ using Acr.UserDialogs;
 using Hyperledger.Aries.Agents;
 using Hyperledger.Aries.Agents.Edge;
 using Hyperledger.Aries.Configuration;
+using Osma.Mobile.App.Services;
 using Osma.Mobile.App.Services.Interfaces;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -14,19 +15,22 @@ namespace Osma.Mobile.App.ViewModels
     public class RegisterViewModel : ABaseViewModel
     {
         private readonly IAgentProvider _agentContextProvider;
-        private readonly IEdgeProvisioningService provisioningService;
+        private readonly IPoolConfigurator _poolConfigurator;
+        private readonly IEdgeProvisioningService _provisioningService;
 
         public RegisterViewModel(
             IUserDialogs userDialogs,
             INavigationService navigationService,
             IAgentProvider agentProvider,
+            IPoolConfigurator poolConfigurator,
             IEdgeProvisioningService provisioningService) : base(
                 nameof(RegisterViewModel),
                 userDialogs,
                 navigationService)
         {
             _agentContextProvider = agentProvider;
-            this.provisioningService = provisioningService;
+            _poolConfigurator = poolConfigurator;
+            _provisioningService = provisioningService;
         }
 
         #region Bindable Commands
@@ -36,7 +40,8 @@ namespace Osma.Mobile.App.ViewModels
 
             try
             {
-                await provisioningService.ProvisionAsync();
+                await _poolConfigurator.ConfigurePoolsAsync();
+                await _provisioningService.ProvisionAsync();
                 Preferences.Set(AppConstant.LocalWalletProvisioned, true);
 
                 await NavigationService.NavigateToAsync<MainViewModel>();

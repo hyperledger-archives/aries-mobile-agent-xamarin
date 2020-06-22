@@ -325,6 +325,10 @@
     <ImageAsset Include="Assets.xcassets\camera_icon.imageset\outline_photo_camera_white_24pt_3x.png">
       <Visible>false</Visible>
     </ImageAsset>
+    <BundleResource Include="Resources\pool_transactions_bcovrin_test_genesis" />
+    <BundleResource Include="Resources\pool_transactions_builder_genesis" />
+    <BundleResource Include="Resources\pool_transactions_sandbox_genesis" />
+    <BundleResource Include="Resources\pool_transactions_live_genesis" />
   </ItemGroup>
   <ItemGroup>
     <NativeReference Include="..\..\libs\ios\libcrypto.a">

@@ -135,10 +135,10 @@
     <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\pool_genesis.Remote.txn" />
-    <None Include="Resources\AboutResources.txt" />
-    <None Include="Assets\AboutAssets.txt" />
-    <None Include="Properties\AndroidManifest.xml" />
+    <AndroidAsset Include="Assets\pool_transactions_bcovrin_test_genesis" />
+    <AndroidAsset Include="Assets\pool_transactions_builder_genesis" />
+    <AndroidAsset Include="Assets\pool_transactions_sandbox_genesis" />
+    <AndroidAsset Include="Assets\pool_transactions_live_genesis" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Tabbar.axml" />
