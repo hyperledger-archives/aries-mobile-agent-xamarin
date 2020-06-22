@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Timers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ using Hyperledger.Aries.Routing;
 using Hyperledger.Aries.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Osma.Mobile.App.Services;
 using Osma.Mobile.App.Services.Interfaces;
 using Osma.Mobile.App.Utilities;
 using Osma.Mobile.App.ViewModels;
@@ -76,8 +78,17 @@ namespace Osma.Mobile.App
                                 path1: FileSystem.AppDataDirectory,
                                 path2: ".indy_client",
                                 path3: "tails");
+
+                            // Available network configurations (see PoolConfigurator.cs):
+                            //   sovrin-live
+                            //   sovrin-staging
+                            //   sovrin-builder
+                            //   bcovrin-test
+                            options.PoolName = "sovrin-staging";
                         },
                         delayProvisioning: true));
+
+                    services.AddSingleton<IPoolConfigurator, PoolConfigurator>();
 
                     var containerBuilder = new ContainerBuilder();
                     containerBuilder.RegisterAssemblyModules(typeof(CoreModule).Assembly);
