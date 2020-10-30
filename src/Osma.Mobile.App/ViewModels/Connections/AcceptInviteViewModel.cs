@@ -63,6 +63,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
             try
             {
                 var (msg, rec) = await _connectionService.CreateRequestAsync(context, _invite);
+                msg.Label = "OSMA";
                 await _messageService.SendAsync(context.Wallet, msg, rec);
 
                 _eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.ConnectionsUpdated });
