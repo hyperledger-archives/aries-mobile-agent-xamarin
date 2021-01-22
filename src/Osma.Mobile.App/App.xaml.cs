@@ -19,11 +19,13 @@ using Osma.Mobile.App.ViewModels.Account;
 using Osma.Mobile.App.ViewModels.Connections;
 using Osma.Mobile.App.ViewModels.CreateInvitation;
 using Osma.Mobile.App.ViewModels.Credentials;
+using Osma.Mobile.App.ViewModels.Proofs;
 using Osma.Mobile.App.Views;
 using Osma.Mobile.App.Views.Account;
 using Osma.Mobile.App.Views.Connections;
 using Osma.Mobile.App.Views.CreateInvitation;
 using Osma.Mobile.App.Views.Credentials;
+using Osma.Mobile.App.Views.Proofs;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -116,6 +118,10 @@ namespace Osma.Mobile.App
             _navigationService.AddPageViewModelBinding<CredentialViewModel, CredentialPage>();
             _navigationService.AddPageViewModelBinding<AccountViewModel, AccountPage>();
             _navigationService.AddPageViewModelBinding<CreateInvitationViewModel, CreateInvitationPage>();
+
+            _navigationService.AddPageViewModelBinding<ProofRequestsViewModel, ProofRequestsPage>();
+            _navigationService.AddPageViewModelBinding<ProofRequestViewModel, ProofRequestPage>();
+            _navigationService.AddPageViewModelBinding<ProofRequestAttributeViewModel, ProofRequestAttributePage>();
 
             if (Preferences.Get(AppConstant.LocalWalletProvisioned, false))
             {

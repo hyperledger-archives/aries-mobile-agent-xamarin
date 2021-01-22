@@ -64,10 +64,10 @@ namespace Osma.Mobile.App.Utilities
                     return unpackedMessage.GetMessage<ConnectionInvitationMessage>();
                 //case MessageTypes.EphemeralChallenge:
                 //    return unpackedMessage.GetMessage<EphemeralChallengeMessage>();
-                //case MessageTypes.PresentProofNames.RequestPresentation:
-                //    return unpackedMessage.GetMessage<RequestPresentationMessage>();
-                //case MessageTypes.IssueCredentialNames.OfferCredential:
-                //    return unpackedMessage.GetMessage<CredentialOfferMessage>();
+                case MessageTypes.PresentProofNames.RequestPresentation:
+                    return unpackedMessage.GetMessage<RequestPresentationMessage>();
+                case MessageTypes.IssueCredentialNames.OfferCredential:
+                    return unpackedMessage.GetMessage<CredentialOfferMessage>();
             }
             return null;
         }
