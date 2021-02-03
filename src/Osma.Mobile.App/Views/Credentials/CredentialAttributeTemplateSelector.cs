@@ -25,7 +25,7 @@ namespace Osma.Mobile.App.Views.Credentials
                 return ErrorTemplate;
             }
 
-            CredentialAttributeType credentialAttributeType;
+            CredentialAttributeType credentialAttributeType = CredentialAttributeType.None;
             var credentialAttribute = item as CredentialAttribute;
 
 
@@ -36,11 +36,12 @@ namespace Osma.Mobile.App.Views.Credentials
 
             try
             {
-                credentialAttributeType = (CredentialAttributeType)Enum.Parse(typeof(CredentialAttributeType), credentialAttribute.Type, true);
+                //credentialAttributeType = (CredentialAttributeType)Enum.Parse(typeof(CredentialAttributeType), credentialAttribute.Type, true);
+                var isTypeDefined = Enum.TryParse<CredentialAttributeType>(credentialAttribute.Type, true, out credentialAttributeType);
             }
-            catch (ArgumentException)
+            catch (ArgumentException xx)
             {
-                throw new ArgumentException("Credential Attribute Type is Invalid");
+                //throw new ArgumentException("Credential Attribute Type is Invalid");
             }
             switch (credentialAttributeType)
             {
@@ -49,7 +50,7 @@ namespace Osma.Mobile.App.Views.Credentials
                 case CredentialAttributeType.File:
                     return FileTemplate;
                 default:
-                    return ErrorTemplate;
+                    return TextTemplate;
 
             }
         }

@@ -5,6 +5,7 @@ using Osma.Mobile.App.ViewModels.Account;
 using Osma.Mobile.App.ViewModels.Connections;
 using Osma.Mobile.App.ViewModels.CreateInvitation;
 using Osma.Mobile.App.ViewModels.Credentials;
+using Osma.Mobile.App.ViewModels.Proofs;
 using ReactiveUI;
 
 namespace Osma.Mobile.App.ViewModels
@@ -17,17 +18,14 @@ namespace Osma.Mobile.App.ViewModels
             ConnectionsViewModel connectionsViewModel,
             CredentialsViewModel credentialsViewModel,
             AccountViewModel accountViewModel,
-            CreateInvitationViewModel createInvitationViewModel
-        ) : base(
-                nameof(MainViewModel),
-                userDialogs,
-                navigationService
-        )
+            CreateInvitationViewModel createInvitationViewModel,
+            ProofRequestsViewModel proofRequestsViewModel) : base(nameof(MainViewModel), userDialogs, navigationService)
         {
             Connections = connectionsViewModel;
             Credentials = credentialsViewModel;
             Account = accountViewModel;
             CreateInvitation = createInvitationViewModel;
+            ProofRequests = proofRequestsViewModel;
         }
 
         public override async Task InitializeAsync(object navigationData)
@@ -36,10 +34,12 @@ namespace Osma.Mobile.App.ViewModels
             await Credentials.InitializeAsync(null);
             await Account.InitializeAsync(null);
             await CreateInvitation.InitializeAsync(null);
+            await ProofRequests.InitializeAsync(null);
             await base.InitializeAsync(navigationData);
         }
 
         #region Bindable Properties
+
         private ConnectionsViewModel _connections;
         public ConnectionsViewModel Connections
         {
@@ -67,6 +67,14 @@ namespace Osma.Mobile.App.ViewModels
             get => _createInvitation;
             set => this.RaiseAndSetIfChanged(ref _createInvitation, value);
         }
+
+        private ProofRequestsViewModel _proofRequests;
+        public ProofRequestsViewModel ProofRequests
+        {
+            get => _proofRequests;
+            set => this.RaiseAndSetIfChanged(ref _proofRequests, value);
+        }
+
         #endregion
     }
 }
