@@ -7,7 +7,10 @@ using System.Windows.Input;
 using Acr.UserDialogs;
 using Autofac;
 using Hyperledger.Aries.Agents;
+using Hyperledger.Aries.Contracts;
+using Hyperledger.Aries.Features.DidExchange;
 using Hyperledger.Aries.Features.IssueCredential;
+using Osma.Mobile.App.Events;
 using Osma.Mobile.App.Extensions;
 using Osma.Mobile.App.Services;
 using Osma.Mobile.App.Services.Interfaces;
@@ -22,22 +25,23 @@ namespace Osma.Mobile.App.ViewModels.Credentials
         private readonly ICredentialService _credentialService;
         private readonly IAgentProvider _agentContextProvider;
         private readonly ILifetimeScope _scope;
+        private readonly IEventAggregator _eventAggregator;
+        private readonly IConnectionService _connectionService;        
 
         public CredentialsViewModel(
             IUserDialogs userDialogs,
             INavigationService navigationService,
             ICredentialService credentialService,
+            IConnectionService connectionService,
             IAgentProvider agentContextProvider,
+            IEventAggregator eventAggregator,
             ILifetimeScope scope
-            ) : base(
-                "Credentials",
-                userDialogs,
-                navigationService
-           )
+            ) : base("Credentials", userDialogs, navigationService)
         {
-
+            _connectionService = connectionService;
             _credentialService = credentialService;
             _agentContextProvider = agentContextProvider;
+            this._eventAggregator = eventAggregator;
             _scope = scope;
 
             this.WhenAnyValue(x => x.SearchTerm)
@@ -48,6 +52,9 @@ namespace Osma.Mobile.App.ViewModels.Credentials
         public override async Task InitializeAsync(object navigationData)
         {
             await RefreshCredentials();
+            _eventAggregator.GetEventByType<ApplicationEvent>()
+                           .Where(_ => _.Type == ApplicationEventType.CredentialsUpdated)
+                           .Subscribe(async _ => await RefreshCredentials());
             await base.InitializeAsync(navigationData);
         }
 
@@ -58,39 +65,46 @@ namespace Osma.Mobile.App.ViewModels.Credentials
             var context = await _agentContextProvider.GetContextAsync();
             var credentialsRecords = await _credentialService.ListAsync(context);
 
-#if DEBUG
-            credentialsRecords.Add(new CredentialRecord
-            {
-                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                State = CredentialState.Issued,
-            });
-            credentialsRecords.Add(new CredentialRecord
-            {
-                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                State = CredentialState.Issued,
-            });
-            credentialsRecords.Add(new CredentialRecord
-            {
-                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
-                State = CredentialState.Issued,
-            });
-#endif
+//#if DEBUG
+//            credentialsRecords.Add(new CredentialRecord
+//            {
+//                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                State = CredentialState.Issued,
+//            });
+//            credentialsRecords.Add(new CredentialRecord
+//            {
+//                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                State = CredentialState.Issued,
+//            });
+//            credentialsRecords.Add(new CredentialRecord
+//            {
+//                ConnectionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialDefinitionId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                CredentialRevocationId = Guid.NewGuid().ToString().ToLowerInvariant(),
+//                State = CredentialState.Issued,
+//            });
+//#endif
 
             IList<CredentialViewModel> credentialsVms = new List<CredentialViewModel>();
             foreach (var credentialRecord in credentialsRecords)
             {
-                CredentialViewModel credential = _scope.Resolve<CredentialViewModel>(new NamedParameter("credential", credentialRecord));
+                if (credentialRecord.State == CredentialState.Rejected)
+                    continue;
+
+                var connection = await _connectionService.GetAsync(context, credentialRecord.ConnectionId);
+                if (connection == null)
+                    continue;
+                CredentialViewModel credential = _scope.Resolve<CredentialViewModel>(new NamedParameter("credential", credentialRecord),
+                                                                                     new NamedParameter("connection", connection));
                 credentialsVms.Add(credential);
-            }
+            }            
 
             var filteredCredentialVms = FilterCredentials(SearchTerm, credentialsVms);
             var groupedVms = GroupCredentials(filteredCredentialVms);
