@@ -125,7 +125,7 @@ namespace Osma.Mobile.App.ViewModels.Credentials
                 var context = await agentContextProvider.GetContextAsync();
 
                 var (request, _) = await credentialService.CreateRequestAsync(context, _credential.Id);
-                await messageService.SendAsync(context.Wallet, request, _connection);
+                await messageService.SendAsync(context, request, _connection );
 
                 eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.CredentialsUpdated });
                 await NavigationService.PopModalAsync();

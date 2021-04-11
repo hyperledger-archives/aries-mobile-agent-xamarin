@@ -139,9 +139,9 @@ namespace Osma.Mobile.App.ViewModels.Proofs
 
                 //TODO: Implement Predicate and Restrictions related functionlity
             }
-            catch (Exception xx)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -177,7 +177,7 @@ namespace Osma.Mobile.App.ViewModels.Proofs
                     else
                     {
                         var (proofMsg, holderRecord) = await proofService.CreatePresentationAsync(context, proofRecord.Id, requestedCredentials);
-                        await messageService.SendAsync(context.Wallet, proofMsg, connection);
+                        await messageService.SendAsync(context, proofMsg, connection);
                     }
 
                 }
