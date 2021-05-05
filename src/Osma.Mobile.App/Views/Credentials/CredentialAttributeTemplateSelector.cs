@@ -39,7 +39,7 @@ namespace Osma.Mobile.App.Views.Credentials
                 //credentialAttributeType = (CredentialAttributeType)Enum.Parse(typeof(CredentialAttributeType), credentialAttribute.Type, true);
                 var isTypeDefined = Enum.TryParse<CredentialAttributeType>(credentialAttribute.Type, true, out credentialAttributeType);
             }
-            catch (ArgumentException xx)
+            catch (ArgumentException)
             {
                 //throw new ArgumentException("Credential Attribute Type is Invalid");
             }

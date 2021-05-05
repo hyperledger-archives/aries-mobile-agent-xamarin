@@ -76,9 +76,9 @@ namespace Osma.Mobile.App.ViewModels.Proofs
                 ProofRequests.InsertRange(proofRequestVms);
                 HasRequests = ProofRequests.Any();
             }
-            catch (Exception xx)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
             finally
             {

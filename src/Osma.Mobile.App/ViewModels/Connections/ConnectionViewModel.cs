@@ -71,7 +71,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
 
             try
             {
-                var response = await _messageService.SendReceiveAsync(context.Wallet, message, _record) as UnpackedMessageContext;
+                var response = await _messageService.SendReceiveAsync(context, message, _record) as UnpackedMessageContext;
                 protocols = response.GetMessage<DiscoveryDiscloseMessage>();
             }
             catch (Exception)
@@ -129,7 +129,7 @@ namespace Osma.Mobile.App.ViewModels.Connections
             bool success = false;
             try
             {
-                var response = await _messageService.SendReceiveAsync(context.Wallet, message, _record) as UnpackedMessageContext;
+                var response = await _messageService.SendReceiveAsync(context, message, _record) as UnpackedMessageContext;
                 var trustPingResponse = response.GetMessage<TrustPingResponseMessage>();
                 success = true;
             }
