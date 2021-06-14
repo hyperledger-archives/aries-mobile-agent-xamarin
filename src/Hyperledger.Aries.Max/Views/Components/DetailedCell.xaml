@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ViewCell
+    x:Class="Hyperledger.Aries.Max.Views.Components.DetailedCell"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:fftransformations="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations">
+    <ViewCell.View>
+        <Grid Padding="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ffimageloading:CachedImage
+                x:Name="Image"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="0"
+                Aspect="Fill"
+                DownsampleUseDipUnits="true"
+                FadeAnimationEnabled="true"
+                HeightRequest="50"
+                VerticalOptions="Center"
+                WidthRequest="50">
+                <ffimageloading:CachedImage.Transformations>
+                    <fftransformations:CircleTransformation />
+                </ffimageloading:CachedImage.Transformations>
+            </ffimageloading:CachedImage>
+            <Label
+                x:Name="TitleLabel"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="1"
+                FontSize="Medium"
+                VerticalOptions="Center" />
+            <Label
+                x:Name="SubtitleLabel"
+                Grid.Row="1"
+                Grid.Column="1"
+                FontSize="Small"
+                VerticalOptions="Center" />
+            <Frame
+                x:Name="NewLabelContainer"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                Padding="6,2"
+                BackgroundColor="#87b938"
+                HasShadow="false"
+                HorizontalOptions="Center"
+                IsVisible="false"
+                VerticalOptions="Center">
+                <Label
+                    x:Name="NewLabel"
+                    FontSize="Medium"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="false"
+                    Text="New"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+            </Frame>
+        </Grid>
+    </ViewCell.View>
+</ViewCell>

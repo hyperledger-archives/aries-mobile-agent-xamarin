@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:Hyperledger.Aries.Max.Converters;assembly=Hyperledger.Aries.Max"
+    xmlns:zxing="clr-namespace:ZXing.Net.Mobile.Forms;assembly=ZXing.Net.Mobile.Forms"
+    x:Class="Hyperledger.Aries.Max.Views.CreateInvitation.CreateInvitationPage"
+    Title="Create Invitation">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBooleanConverter x:Key="BooleanInverse" />
+            <converters:SelecteditemEventArgsToSelectedItemConverter x:Key="SelectedItemConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ScrollView>
+        <StackLayout Padding="5">
+            <StackLayout>
+                <Button Text="Create Invitation" Command="{Binding CreateInvitationCommand}"></Button>
+            </StackLayout>
+            <zxing:ZXingBarcodeImageView
+                            BarcodeValue="{Binding QrCodeValue}"
+                            BarcodeFormat="QR_CODE"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand">
+            </zxing:ZXingBarcodeImageView>
+        </StackLayout>
+    </ScrollView>
+</ContentPage> 

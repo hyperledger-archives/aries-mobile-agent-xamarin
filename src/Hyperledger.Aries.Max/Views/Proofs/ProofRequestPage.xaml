@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Hyperledger.Aries.Max.Views.Proofs.ProofRequestPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:behaviors="clr-namespace:Hyperledger.Aries.Max.Behaviors;assembly=Hyperledger.Aries.Max"
+    xmlns:components="clr-namespace:Hyperledger.Aries.Max.Views.Components;assembly=Hyperledger.Aries.Max"
+    xmlns:converters="clr-namespace:Hyperledger.Aries.Max.Converters;assembly=Hyperledger.Aries.Max"
+    xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+    Title="{Binding Name}"
+    ios:Page.UseSafeArea="true">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary>
+                <converters:SelecteditemEventArgsToSelectedItemConverter x:Key="SelectedItemConverter" />
+                <converters:InverseBooleanConverter x:Key="BooleanInverse" />
+            </ResourceDictionary>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout>
+
+            <ffimageloading:CachedImage
+                Aspect="AspectFill"
+                HeightRequest="100"
+                HorizontalOptions="Center"
+                IsVisible="False"
+                Source="{Binding ConnectionLogo}"
+                VerticalOptions="Center"
+                WidthRequest="150">
+                <ffimageloading:CachedImage.Triggers>
+                    <DataTrigger
+                        Binding="{Binding HasLogo}"
+                        TargetType="ffimageloading:CachedImage"
+                        Value="True">
+                        <Setter Property="IsVisible" Value="True" />
+                    </DataTrigger>
+                </ffimageloading:CachedImage.Triggers>
+            </ffimageloading:CachedImage>
+
+            <Label
+                FontAttributes="Bold"
+                FontSize="Medium"
+                HorizontalOptions="Center"
+                Text="{Binding ProofRequestName}" />
+            <Label
+                FontSize="Default"
+                HorizontalOptions="Center"
+                Text="{Binding ConnectionName}" />
+            <ListView HasUnevenRows="True" ItemsSource="{Binding RequestedAttributes}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <components:DetailedCell Title="{Binding AttributeName}" Subtitle="{Binding AttributeReferent}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Behaviors>
+                    <behaviors:EventToCommandBehavior
+                        Command="{Binding ViewAttributeDetailCommand}"
+                        Converter="{StaticResource SelectedItemConverter}"
+                        DeselectOnClick="true"
+                        EventName="ItemSelected" />
+                </ListView.Behaviors>
+            </ListView>
+            <Grid
+                Margin="0,0,0,0"
+                ColumnSpacing="0"
+                HeightRequest="70"
+                VerticalOptions="End">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    BackgroundColor="OrangeRed"
+                    Command="{Binding DismissProofRequestCommand}"
+                    Text="Reject" />
+                <Button
+                    Grid.Column="1"
+                    BackgroundColor="LightGreen"
+                    Command="{Binding PresentProofCommand}"
+                    Text="Present Proof" />
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

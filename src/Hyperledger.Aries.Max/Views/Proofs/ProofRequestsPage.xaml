@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Hyperledger.Aries.Max.Views.Proofs.ProofRequestsPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:Hyperledger.Aries.Max.Converters;assembly=Hyperledger.Aries.Max"
+    xmlns:behaviors="clr-namespace:Hyperledger.Aries.Max.Behaviors;assembly=Hyperledger.Aries.Max"
+    xmlns:components="clr-namespace:Hyperledger.Aries.Max.Views.Components;assembly=Hyperledger.Aries.Max"
+    Title="{Binding Name}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:SelecteditemEventArgsToSelectedItemConverter x:Key="SelectedItemConverter" />
+            <converters:InverseBooleanConverter x:Key="BooleanInverse" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Name="Scan Proof Request"
+            Command="{Binding ScanProofRequestCommand}"
+            Order="Primary"
+            Priority="0"
+            Text="Scan" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout>
+                <ListView
+                    HasUnevenRows="True"
+                    IsEnabled="{Binding RefreshingProofRequests, Converter={StaticResource BooleanInverse}}"
+                    IsPullToRefreshEnabled="True"
+                    IsRefreshing="{Binding RefreshingProofRequests}"
+                    ItemsSource="{Binding ProofRequests}"
+                    RefreshCommand="{Binding RefreshCommand}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <components:DetailedCell
+                                Title="{Binding ProofType}"
+                                ImageURL="{Binding Logo}"
+                                Subtitle="{Binding ConnectionName}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.Behaviors>
+                        <behaviors:EventToCommandBehavior
+                            Command="{Binding SelectProofRequestCommand}"
+                            Converter="{StaticResource SelectedItemConverter}"
+                            DeselectOnClick="true"
+                            EventName="ItemSelected" />
+                    </ListView.Behaviors>
+                </ListView>
+            </StackLayout>
+            <!--<StackLayout IsVisible="{Binding HasRequests, Converter={StaticResource BooleanInverse}}" VerticalOptions="FillAndExpand">
+                <StackLayout
+                    HorizontalOptions="CenterAndExpand"
+                    Orientation="Vertical"
+                    VerticalOptions="CenterAndExpand">
+                    <ActivityIndicator IsRunning="{Binding RefreshingConnections}" IsVisible="{Binding RefreshingConnections}" />
+                    <Label
+                        HorizontalOptions="CenterAndExpand"
+                        HorizontalTextAlignment="Center"
+                        IsVisible="{Binding RefreshingConnections, Converter={StaticResource BooleanInverse}}"
+                        Text="You have no connections - Click connect to get started" />
+                </StackLayout>
+            </StackLayout>-->
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

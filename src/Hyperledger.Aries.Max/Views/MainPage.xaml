@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage
+    x:Class="Hyperledger.Aries.Max.Views.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:account="clr-namespace:Hyperledger.Aries.Max.Views.Account;assembly=Hyperledger.Aries.Max"
+    xmlns:connections="clr-namespace:Hyperledger.Aries.Max.Views.Connections;assembly=Hyperledger.Aries.Max"
+    xmlns:credentials="clr-namespace:Hyperledger.Aries.Max.Views.Credentials;assembly=Hyperledger.Aries.Max"
+    xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+    xmlns:proofRequests="clr-namespace:Hyperledger.Aries.Max.Views.Proofs;assembly=Hyperledger.Aries.Max"
+    Appearing="Appearing"
+    CurrentPageChanged="CurrentPageChanged">
+    <connections:ConnectionsPage
+        ios:NavigationPage.PrefersLargeTitles="true"
+        BindingContext="{Binding Connections}"
+        Icon="connection_icon.png" />
+    <credentials:CredentialsPage
+        ios:NavigationPage.PrefersLargeTitles="true"
+        BindingContext="{Binding Credentials}"
+        Icon="credentials_icon.png" />
+    <proofRequests:ProofRequestsPage
+        ios:NavigationPage.PrefersLargeTitles="true"
+        BindingContext="{Binding ProofRequests}"
+        Icon="credentials_icon.png" />
+    <account:AccountPage
+        ios:NavigationPage.PrefersLargeTitles="true"
+        BindingContext="{Binding Account}"
+        Icon="account_icon.png" />
+</TabbedPage>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:forms="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+    xmlns:converters="clr-namespace:Hyperledger.Aries.Max.Converters;assembly=Hyperledger.Aries.Max"
+    xmlns:connections="clr-namespace:Hyperledger.Aries.Max.Views.Connections;assembly=Hyperledger.Aries.Max"
+
+    x:Class="Hyperledger.Aries.Max.Views.Connections.ConnectionPage"
+>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBooleanConverter x:Key="BooleanInverse" />
+            <DataTemplate x:Key="actionTemplate">
+                <ViewCell>
+                    <connections:ActionItemView/>
+                </ViewCell>
+            </DataTemplate>
+            <DataTemplate x:Key="multiActionTemplate">
+                <ViewCell>
+                    <connections:MultiActionItemView/>
+                </ViewCell>
+            </DataTemplate>
+            <DataTemplate x:Key="statusTemplate">
+                <ViewCell>
+                    <connections:StatusItemView/>
+                </ViewCell>
+            </DataTemplate>
+             <DataTemplate x:Key="errorTemplate">
+                <ViewCell>
+                    <connections:ErrorItemView/>
+                </ViewCell>
+            </DataTemplate>
+            <connections:ConnectionTransactionTemplateSelector
+                x:Key="connectionTransactionTemplateSelector"
+                ActionTemplate="{StaticResource actionTemplate}"
+                MultiActionTemplate="{StaticResource multiActionTemplate}"
+                StatusTemplate="{StaticResource statusTemplate}"
+                ErrorTemplate="{StaticResource errorTemplate}"
+            />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <AbsoluteLayout
+                BackgroundColor="{StaticResource NavigationBarColor}">
+            <StackLayout
+                Margin="0,64,0,0"
+                AbsoluteLayout.LayoutBounds="0,0,1,1"
+                AbsoluteLayout.LayoutFlags="SizeProportional"
+                BackgroundColor="{StaticResource NavigationBarColor}"
+            >
+                    <Grid
+                        IsClippedToBounds="false"
+                    >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="64"/>
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="48" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="48" />
+                            </Grid.ColumnDefinitions>
+                            <ImageButton
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Source="back_icon.png"
+                                VerticalOptions="Start"
+                                Command="{Binding NavigateBackCommand}"
+                                Style="{StaticResource IconButtonStyle}"
+                            />
+                            <forms:CachedImage
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                HeightRequest="48"
+                                WidthRequest="48"
+                                FadeAnimationEnabled="true"
+                                DownsampleUseDipUnits="true"
+                                Source="{ Binding ConnectionImageUrl }"
+                                Aspect="AspectFit"
+                            />
+                            <ImageButton
+                                VerticalOptions="Start"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Source="more_icon.png"
+                                Style="{StaticResource IconButtonStyle}"
+                               Clicked="ToggleModalTapped"
+                            />
+                            
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="3"
+                                FontSize="Medium"
+                                TextColor="{StaticResource NavigationBarTextColor}"
+                                Text="{Binding ConnectionName}"
+                                FontAttributes="Bold"
+                                HorizontalTextAlignment="Center"
+                            />
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="3"
+                                FontSize="Small"
+                                TextColor="{StaticResource NavigationBarTextColor}"
+                                Text="{ Binding ConnectionSubtitle }"
+                                HorizontalTextAlignment="Center"
+                            />
+                    </Grid>
+            <ListView
+                SelectionMode="None"
+                HasUnevenRows="true"
+                BackgroundColor="{StaticResource BasePageColor}"
+                ItemsSource="{Binding Transactions}"
+                IsRefreshing="{Binding RefreshingTransactions}"
+                IsPullToRefreshEnabled="True"
+                RefreshCommand="{Binding RefreshTransactionsCommand}"
+                ItemTemplate="{StaticResource connectionTransactionTemplateSelector}"
+                SeparatorVisibility="None"
+            />
+                
+            </StackLayout>
+            <Frame
+                AbsoluteLayout.LayoutFlags="XProportional, WidthProportional, HeightProportional"
+                AbsoluteLayout.LayoutBounds="0, 96, 1, 1"
+                HasShadow="false"
+                BackgroundColor="Transparent"
+                x:Name="moreModal"
+                IsVisible="false"
+            >
+                <Frame
+                    HasShadow="true"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                >
+                    <StackLayout
+                        Margin="0"
+                        Padding="0"
+                        BackgroundColor="White"
+                        Opacity="1"
+                    >
+                        <StackLayout Orientation="Horizontal">
+                            <forms:CachedImage
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                HeightRequest="24"
+                                WidthRequest="24"
+                                FadeAnimationEnabled="true"
+                                DownsampleUseDipUnits="true"
+                                Source="{ Binding ConnectionImageUrl }"
+                                Aspect="AspectFit"
+                            />
+                            <Label
+                                Text="{Binding TheirDid, StringFormat='did:  {0}'}"
+                                TextColor="Black"
+                                FontSize="Small"
+                            />
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <forms:CachedImage
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                VerticalOptions="Start"
+                                HorizontalOptions="Center"
+                                HeightRequest="24"
+                                WidthRequest="24"
+                                FadeAnimationEnabled="true"
+                                DownsampleUseDipUnits="true"
+                                Source="{ Binding ConnectionImageUrl }"
+                                Aspect="AspectFit"
+                            />
+                            <Label
+                                Text="{Binding MyDid, StringFormat='did:  {0}'}"
+                                TextColor="Black"
+                                FontSize="Small"
+                            />
+                        </StackLayout>
+                        <Button
+                            HorizontalOptions="FillAndExpand"
+                            Text="Delete Connection"
+                            Command="{Binding DeleteConnectionCommand}"
+                            Style="{StaticResource ButtonStyleDestructive}"
+                        />
+                    </StackLayout>
+                </Frame>    
+            </Frame>
+            
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>
