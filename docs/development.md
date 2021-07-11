@@ -10,11 +10,11 @@ The following document describes several conventions and technologies adopted by
     │  ├── android                   # Static libraries for Android
     │  ├── ios                       # Static libraries for iOS     
     ├── src                          # Source folder
-    │   ├── osma-mobile-app.sln      # Main application solution file.
-    │   ├── Osma.Mobile.App          # Location of Xamarin.Forms App shared between the two platforms invoked by each platform.
-    │   ├── Osma.Mobile.App.Android  # Location of the Android platform app.
-    │   ├── Osma.Mobile.App.iOS      # Location of the iOS platform app.
-    └───└── Osma.Mobile.App.Services # Location of the shared services project, containing re-usable, platform agnostic services. 
+    │   ├── aries-max-app.sln        # Main application solution file.
+    │   ├── Hyperledger.Aries.Max    # Location of Xamarin.Forms App shared between the two platforms invoked by each platform.
+    │   ├── Hyperledger.Aries.Max.Android  # Location of the Android platform app.
+    │   ├── Hyperledger.Aries.Max.iOS      # Location of the iOS platform app.
+    └───└── Hyperledger.Aries.Max.Services # Location of the shared services project, containing re-usable, platform agnostic services. 
 
 ## Gorilla Player UI Development
 
@@ -22,9 +22,9 @@ The Xamarin.Forms project is setup to support [Gorilla Player](https://grialkit.
 
 To harness the full power of Gorilla Player the application must be built with Gorilla Players SDK enabled, in order to resolve any third party UI assemblies. To do this, select the Gorilla build configuration when building the app to a device.
 
-Design time data in Gorilla player allows for the quick preview of populated views, this data is controlled via the `DesignTimeData.json` file located at the root of the Osma.Mobile.App folder.
+Design time data in Gorilla player allows for the quick preview of populated views, this data is controlled via the `DesignTimeData.json` file located at the root of the Hyperledger.Aries.Max folder.
 
-Any other advanced settings associated to Gorilla Player and this app can be configured via the `Gorilla.json` also located at the root of the Osma.Mobile.App folder.
+Any other advanced settings associated to Gorilla Player and this app can be configured via the `Gorilla.json` also located at the root of the Hyperledger.Aries.Max folder.
 
 [General Wiki link](https://github.com/UXDivers/Gorilla-Player-Support/wiki)
 
@@ -37,18 +37,18 @@ When you first clone the repository, depending on the version of your git client
 
 ## Architecture 
 
-This project adopts the [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture pattern. Using [DI](https://en.wikipedia.org/wiki/Dependency_injection) for dependency management. The core of this app resides in `src/Osma.Mobile.App` which is broken down as follows
+This project adopts the [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) architecture pattern. Using [DI](https://en.wikipedia.org/wiki/Dependency_injection) for dependency management. The core of this app resides in `src/Hyperledger.Aries.Max` which is broken down as follows
 
-    ├── Osma.Mobile.App              # Source folder
+    ├── Hyperledger.Aries.Max              # Source folder
     │   ├── Behaviours              # Location of any custom behaviours for view elements resides.
     │   ├── Converters              # Location of any custom converters for view elements or other components resides.
     │   ├── Extensions              # Location of any extensions to core components.
-    │   ├── Services                # Location of any shared services coupled to Xamarin.Forms (Note - all other shared services reside in Osma.Mobile.App.Services). 
+    │   ├── Services                # Location of any shared services coupled to Xamarin.Forms (Note - all other shared services reside in Hyperledger.Aries.Max.Services). 
     │   ├── Utilites                # Location of any custom utilities for view elements.
     │   ├── ViewModels              # Location of the view models.
     └───└── Views                   # Location of the views.
 
-Note - As mentioned above any shared services that are not bound to Xamarin.Forms, should be located in `src/Osma.Mobile.App.Services`. Platform specific services should be located in their respective projects, with the common contract or interface defining them located in the either `src/Osma.Mobile.App` or `src/Osma.Mobile.App.Services`. Invoking the platform specific service for each platform should be managed via the `PlatformModule.cs` defined in each platform specific project
+Note - As mentioned above any shared services that are not bound to Xamarin.Forms, should be located in `src/Hyperledger.Aries.Max.Services`. Platform specific services should be located in their respective projects, with the common contract or interface defining them located in the either `src/Hyperledger.Aries.Max` or `src/Hyperledger.Aries.MaxServices`. Invoking the platform specific service for each platform should be managed via the `PlatformModule.cs` defined in each platform specific project
 
 ## XAML View Conventions
 
