@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:versionCode="1"
+        android:versionName="0.1.0"
+        package="com.ariesmax"
+        android:installLocation="internalOnly">
+    <uses-sdk android:minSdkVersion="25" android:targetSdkVersion="29"/>
+    <application android:requestLegacyExternalStorage="true" android:label="AriesMax"></application>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+</manifest>

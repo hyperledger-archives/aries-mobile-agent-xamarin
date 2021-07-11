@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:components="clr-namespace:Hyperledger.Aries.Max.Views.Components;assembly=Hyperledger.Aries.Max"
+             xmlns:converters="clr-namespace:Hyperledger.Aries.Max.Converters;assembly=Hyperledger.Aries.Max"
+             xmlns:behaviours="clr-namespace:Hyperledger.Aries.Max.Behaviors;assembly=Hyperledger.Aries.Max"
+             x:Class="Hyperledger.Aries.Max.Views.Connections.ConnectionsPage"
+             Title="{Binding Name}"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.LargeTitleDisplay="Always"
+    >
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:SelecteditemEventArgsToSelectedItemConverter x:Key="SelectedItemConverter" />
+            <converters:InverseBooleanConverter x:Key="BooleanInverse" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Name="Add Connection" Order="Primary" Text="Connect" Priority="0" Command ="{Binding ScanInviteCommand}"/>
+        <ToolbarItem Name="CreateInvitation" Order="Secondary" Text="Create Invitation" ios:NavigationPage.PrefersLargeTitles="true" Priority="0" Command ="{Binding CreateInvitationCommand}"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout
+                IsVisible="{Binding HasConnections}">
+                <ListView
+                    HasUnevenRows="True"
+                    IsPullToRefreshEnabled="True"
+                    IsRefreshing="{Binding RefreshingConnections}"
+                    RefreshCommand="{Binding RefreshCommand}"
+                    IsEnabled="{Binding RefreshingConnections, Converter={StaticResource BooleanInverse}}"
+                    ItemsSource="{Binding Connections}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <components:DetailedCell
+                            Title="{Binding ConnectionName}"
+                            Subtitle="{Binding ConnectionSubtitle}"
+                            ImageURL="{Binding ConnectionImageUrl}"
+                        />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.Behaviors>
+                        <behaviours:EventToCommandBehavior EventName="ItemSelected" Command="{Binding SelectConnectionCommand}" Converter="{StaticResource SelectedItemConverter}" DeselectOnClick="true"/>
+                    </ListView.Behaviors>
+                </ListView>
+            </StackLayout>
+            <StackLayout
+                VerticalOptions="FillAndExpand"
+                IsVisible="{Binding HasConnections, Converter={StaticResource BooleanInverse}}">
+                <StackLayout
+                    Orientation="Vertical"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand">
+                    <ActivityIndicator
+                        IsVisible="{Binding RefreshingConnections}"
+                        IsRunning="{Binding RefreshingConnections}"/>
+                    <Label
+                        HorizontalOptions="CenterAndExpand"
+                        HorizontalTextAlignment="Center"
+                        IsVisible="{Binding RefreshingConnections, Converter={StaticResource BooleanInverse}}" 
+                        Text="You have no connections - Click connect to get started" />
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
