@@ -33,7 +33,7 @@
     <PackageReference Include="West.Extensions.XamarinHosting" Version="3.0.0-preview1" />
     <PackageReference Include="Xamarin.FFImageLoading.Transformations" Version="2.4.11.982" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
-    <PackageReference Include="Hyperledger.Aries.Routing.Edge" Version="1.6.1" />
+    <PackageReference Include="Hyperledger.Aries.Routing.Edge" Version="1.6.2" />
   </ItemGroup>
 
   <ItemGroup>
