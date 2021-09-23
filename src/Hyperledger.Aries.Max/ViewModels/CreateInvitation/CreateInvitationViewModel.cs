@@ -48,7 +48,7 @@ namespace Hyperledger.Aries.Max.ViewModels.CreateInvitation
                     AutoAcceptConnection = true
                 });
                 invitation.label = "AriesMax"
-                string barcodeValue = invitation.ServiceEndpoint + "?d_m=" + Uri.EscapeDataString(invitation.ToByteArray().ToBase64String());
+                string barcodeValue = invitation.ServiceEndpoint + "?c_i=" + Uri.EscapeDataString(invitation.ToByteArray().ToBase64String());
                 QrCodeValue = barcodeValue;
             }
             catch (Exception ex)
