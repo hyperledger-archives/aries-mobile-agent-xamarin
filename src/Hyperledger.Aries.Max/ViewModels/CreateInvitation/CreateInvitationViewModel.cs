@@ -44,10 +44,11 @@ namespace Hyperledger.Aries.Max.ViewModels.CreateInvitation
                 var context = await _agentContextProvider.GetContextAsync();
                 var (invitation, _) = await _connectionService.CreateInvitationAsync(context, new InviteConfiguration
                 {
-                    TheirAlias = new ConnectionAlias { Name = "Invitation" }
+                    TheirAlias = new ConnectionAlias { Name = "Invitation" },
+                    AutoAcceptConnection = true
                 });
-
-                string barcodeValue = invitation.ServiceEndpoint + "?d_m=" + Uri.EscapeDataString(invitation.ToByteArray().ToBase64String());
+                invitation.label = "AriesMax"
+                string barcodeValue = invitation.ServiceEndpoint + "?c_i=" + Uri.EscapeDataString(invitation.ToByteArray().ToBase64String());
                 QrCodeValue = barcodeValue;
             }
             catch (Exception ex)
