@@ -61,7 +61,7 @@ namespace Hyperledger.Aries.Max.ViewModels.Connections
             var records = await _connectionService.ListAsync(context);
 
             IList<ConnectionViewModel> connectionVms = new List<ConnectionViewModel>();
-            foreach (var record in records)
+            foreach (var record in records.OrderByDescending(c => c.CreatedAtUtc))
             {
                 var connection = _scope.Resolve<ConnectionViewModel>(new NamedParameter("record", record));
                 connectionVms.Add(connection);
