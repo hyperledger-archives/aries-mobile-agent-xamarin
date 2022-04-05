@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Android;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using Android.Systems;
 using FFImageLoading.Forms.Platform;
 using Java.Lang;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Hyperledger.Aries.Max.Android;
 using Xamarin.Forms;
 using Resource = Hyperledger.Aries.Max.Android.Resource;
+using Xamarin.Essentials;
+using Xamarin.Forms.Xaml;
 
 namespace Hyperledger.Aries.Max.Droid
 {
-    [Activity(Label = "AriesMax", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "AriesMax", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, Exported = true)]
+    [XamlCompilation(XamlCompilationOptions.Compile)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle bundle)
@@ -40,9 +42,11 @@ namespace Hyperledger.Aries.Max.Droid
 
             // Initializing User Dialogs
             // Android requires that we set content root.
-            var host = Hyperledger.Aries.Max.App.BuildHost(typeof(PlatformModule).Assembly)
-                .UseContentRoot(System.Environment.GetFolderPath(
-                    System.Environment.SpecialFolder.Personal)).Build();
+            var host = App.BuildHost(typeof(PlatformModule).Assembly)
+                    .UseContentRoot(System.Environment.GetFolderPath(
+                        System.Environment.SpecialFolder.Personal)).Build();
+
+            Os.Setenv("EXTERNAL_STORAGE", FileSystem.AppDataDirectory, true);
 
             //Loading dependent libindy
             JavaSystem.LoadLibrary("c++_shared");
@@ -55,8 +59,6 @@ namespace Hyperledger.Aries.Max.Droid
 
         readonly string[] _permissionsRequired =
         {
-            Manifest.Permission.ReadExternalStorage,
-            Manifest.Permission.WriteExternalStorage,
             Manifest.Permission.Camera
         };
 
@@ -85,9 +87,9 @@ namespace Hyperledger.Aries.Max.Droid
                 System.Diagnostics.Debug.WriteLine("All permissions required that werent granted, have now been granted");
             else
                 System.Diagnostics.Debug.WriteLine("Some permissions requested were denied by the user");
-           
-           Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-           base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

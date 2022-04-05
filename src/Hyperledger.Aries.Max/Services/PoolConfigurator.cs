@@ -39,7 +39,8 @@ namespace Hyperledger.Aries.Max.Services
                 try
                 {
                     // Path for bundled genesis txn
-                    var filename = Path.Combine(FileSystem.CacheDirectory, "genesis.txn");
+                    var filesDir = FileSystem.AppDataDirectory;
+                    var filename = Path.Combine(filesDir, config.Value);
 
                     // Dump file contents to cached filename
                     using (var stream = await FileSystem.OpenAppPackageFileAsync(config.Value))

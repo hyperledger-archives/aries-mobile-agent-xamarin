@@ -93,7 +93,7 @@ namespace Hyperledger.Aries.Max.ViewModels.Credentials
 //#endif
 
             IList<CredentialViewModel> credentialsVms = new List<CredentialViewModel>();
-            foreach (var credentialRecord in credentialsRecords)
+            foreach (var credentialRecord in credentialsRecords.OrderByDescending(c => c.CreatedAtUtc))
             {
                 if (credentialRecord.State == CredentialState.Rejected)
                     continue;

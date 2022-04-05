@@ -66,7 +66,7 @@ namespace Hyperledger.Aries.Max.ViewModels.Proofs
                 IEnumerable<ProofRecord> proofRequests = (await _proofService.ListRequestedAsync(agentContext));
 
                 IList<ProofRequestViewModel> proofRequestVms = new List<ProofRequestViewModel>();
-                foreach (var proofReq in proofRequests)
+                foreach (var proofReq in proofRequests.OrderByDescending(c => c.CreatedAtUtc))
                 {
                     var connection = await _connectionService.GetAsync(agentContext, proofReq.ConnectionId);
                     var proofRequestViewModel = _scope.Resolve<ProofRequestViewModel>(new NamedParameter("proofRecord", proofReq), new NamedParameter("connection", connection));

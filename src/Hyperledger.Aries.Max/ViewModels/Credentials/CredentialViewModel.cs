@@ -48,9 +48,9 @@ namespace Hyperledger.Aries.Max.ViewModels.Credentials
             this._credential = credential;
             this._connection = connection;
 
-            CredentialName = _credential.SchemaId.ToCredentialName();
+            CredentialName = _connection.Alias.Name;
             CredentialImageUrl = _connection.Alias.ImageUrl;
-            CredentialSubtitle = _connection.Alias.Name;
+            CredentialSubtitle = _credential.State.ToString();
             CreatedAt = _credential.CreatedAtUtc?.ToLocalTime();
             CredentialState = _credential.State;
             _isNew = IsCredentialNew(_credential);
@@ -65,7 +65,7 @@ namespace Hyperledger.Aries.Max.ViewModels.Credentials
                     Name = x.Name,
                     Value = x.Value != null ? x.Value.ToString() : string.Empty,
                     Type = x.MimeType
-                }));
+                }).OrderBy(x => x.Name));
             }
 
             //#if DEBUG
@@ -125,7 +125,7 @@ namespace Hyperledger.Aries.Max.ViewModels.Credentials
                 var context = await agentContextProvider.GetContextAsync();
 
                 var (request, _) = await credentialService.CreateRequestAsync(context, _credential.Id);
-                await messageService.SendAsync(context, request, _connection );
+                await messageService.SendAsync(context, request, _connection);
 
                 eventAggregator.Publish(new ApplicationEvent() { Type = ApplicationEventType.CredentialsUpdated });
                 await NavigationService.PopModalAsync();
